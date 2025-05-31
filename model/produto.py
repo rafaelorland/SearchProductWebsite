@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 
+@dataclass
 class Product:
     sku: int
     title: str
