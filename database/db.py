@@ -1,26 +1,32 @@
 import sqlite3
 
+from config import DB_PATH
 from model.product import Product
 
-def create_table(db_path):
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+class Database:
+    def __init__(self):
+        self.conn = sqlite3.connect(DB_PATH['database'])
+        self._create_tables()
 
-        cursor.execute("""
+    def create_table(self):
+            
+            cursor = self.conn.cursor()
 
-        CREATE TABLE IF NOT EXISTS products (
-            sku INTEGER PRIMARY KEY,
-            title TEXT,
-            price REAL,
-            price_in_pix REAL,
-            installment_value REAL,
-            quantity_installment INTEGER,
-            description_technique TEXT
-        );
+            cursor.execute("""
 
-        """)
+            CREATE TABLE IF NOT EXISTS products (
+                sku INTEGER PRIMARY KEY,
+                title TEXT,
+                price REAL,
+                price_in_pix REAL,
+                installment_value REAL,
+                quantity_installment INTEGER,
+                description_technique TEXT
+            );
 
-        conn.commit()
-        conn.close()
+            """)
 
-# def get_product(db_path,product: Product):
+            self.conn.commit()
+            
+
+    # def get_product(db_path,product: Product):
