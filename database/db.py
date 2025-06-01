@@ -6,7 +6,7 @@ from model.product import Product
 
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect(DB_PATH['database'])
+        self.conn = sqlite3.connect(DB_PATH)
         self._create_tables()
 
     def _create_tables(self):
@@ -44,4 +44,5 @@ class Database:
 
         self.conn.commit()
 
-    # def get_product(db_path,product: Product):
+    def close(self):
+        self.conn.close()
