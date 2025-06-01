@@ -1,4 +1,5 @@
 import sqlite3
+from typing import List
 
 from config import DB_PATH
 from model.product import Product
@@ -8,7 +9,7 @@ class Database:
         self.conn = sqlite3.connect(DB_PATH['database'])
         self._create_tables()
 
-    def create_table(self):
+    def _create_tables(self):
             
             cursor = self.conn.cursor()
 
@@ -27,6 +28,20 @@ class Database:
             """)
 
             self.conn.commit()
-            
+
+    def save_products(self, products: List[Product]):
+        cursor = self.conn.cursor()
+
+        for product in products:
+
+            cursor.execute("""
+
+                INSERT OR REPLACE INTO products
+                VALUES (:sku, :title, :price, :price_in_pix, :installment_value, :quantity_installment, :description_technique)
+
+            """,
+            product.to_dict())
+
+        self.conn.commit()
 
     # def get_product(db_path,product: Product):
