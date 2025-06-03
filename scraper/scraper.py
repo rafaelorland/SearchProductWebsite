@@ -30,6 +30,32 @@ class MaetoScraper:
     def _parse_price(self, price_str):
         return float(re.sub(r'[^\d,]', '', price_str).replace(',', '.'))
     
+    def _get_technical_description(self, product_url: str) -> str:
+        response = self._make_request(product_url)
+        if not response:
+            return "Não foi possível acessar a página do produto"
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        details_tab = soup.find('div', {'id': 'details'})
+        if not details_tab:
+            return "Estrutura da página não encontrada"
+        
+        # Processa a tabela de atributos técnicos
+        tech_table = details_tab.find('table', {'id': 'product-description-table-attributes'})
+        if not tech_table:
+            return "Tabela de informações técnicas não encontrada"
+        
+        tech_info = []
+        for row in tech_table.find_all('tr'):
+            cols = row.find_all('td')
+            if len(cols) == 2:
+                attribute = cols[0].get_text(strip=True)
+                value = cols[1].get_text(strip=True)
+                tech_info.append(f"{attribute}: {value}")
+        
+        return "\n".join(tech_info)
+
     def search_products(self, search_term: str) -> List[Product]:
         products = []
         response = self._make_request(f"{self.settings.SEARCH_URL}{search_term}")
@@ -55,7 +81,9 @@ class MaetoScraper:
                 installments = parcel.find('span', class_='installments-number').text.strip()
                 quantity_installment = int(installments.replace('x', ''))
                 installment_value = self._parse_price(parcel.find('span', class_='installments-amount').text.strip())
-                
+
+                descricao = self._get_technical_description(product_url)
+
                 products.append(Product(
                     sku=sku,
                     title=title,
@@ -63,7 +91,7 @@ class MaetoScraper:
                     price_in_pix=price_in_pix,
                     installment_value=installment_value,
                     quantity_installment=quantity_installment,
-                    description_technique="Ver página do produto para detalhes técnicos"
+                    description_technique=descricao
                 ))
             except Exception as e:
                 print(f"Erro ao processar produto: {e}")
