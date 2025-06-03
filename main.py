@@ -8,7 +8,7 @@ def main():
         search_term = input("Digite o nome do produto para buscar ou digite (sair) para encerrar: ").strip()
 
         if search_term.lower() == 'sair':
-            print(("="*6)+"Encerrando o buscador."+("="*6))
+            print(("="*6)+" Encerrando o buscador "+("="*6))
             break
 
         if not search_term:
